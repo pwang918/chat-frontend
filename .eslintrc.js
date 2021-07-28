@@ -13,11 +13,19 @@ module.exports = {
   },
   plugins: ["react"],
   rules: {
-    noRestrictedImports: [
+    "no-restricted-imports": [
       "error",
       {
         patterns: ["@material-ui/*/*/*", "!@material-ui/core/test-utils/*"],
       },
     ],
+  },
+  settings: {
+    "import/resolver": {
+      node: {
+        paths: ["src"],
+        extensions: [".js", ".jsx"],
+      },
+    },
   },
 };
