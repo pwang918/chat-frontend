@@ -10,6 +10,8 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
+import useSocket from 'hooks/useSocket';
+
 const useStyles = makeStyles((theme) => ({
   container: {
     maxWidth: 600,
@@ -29,6 +31,11 @@ export default function Login() {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [roomname, setRoomname] = useState('');
+  const socket = useSocket();
+
+  const onJoinRoom = () => {
+    socket.emit('join', { username, roomname });
+  };
 
   return (
     <Container component="main" className={classes.container}>
@@ -63,7 +70,7 @@ export default function Login() {
                 variant="contained"
                 color="primary"
                 disabled={!username || !roomname}
-                href={`/chat/${roomname}`}
+                onClick={onJoinRoom}
               >
                 Join
               </Button>

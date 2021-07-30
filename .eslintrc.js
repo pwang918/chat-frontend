@@ -19,6 +19,7 @@ module.exports = {
         patterns: ["@material-ui/*/*/*", "!@material-ui/core/test-utils/*"],
       },
     ],
+    "react/prop-types": 0,
   },
   settings: {
     "import/resolver": {
