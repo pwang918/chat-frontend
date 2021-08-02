@@ -1,7 +1,7 @@
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 
 import io from 'socket.io-client';
 
@@ -12,6 +12,7 @@ export function SocketProvider({ children }) {
   const [user, setUser] = useState();
   const [messages, setMessages] = useState([]);
   const history = useHistory();
+  const { url } = useRouteMatch();
 
   useEffect(() => {
     socket.on('message', (data) => {
@@ -25,7 +26,12 @@ export function SocketProvider({ children }) {
         });
       }
 
-      history.push(`/chat/${data.room}`);
+      if (data.disconnect) {
+        setUser(undefined);
+        setMessages([]);
+      } else if (url !== `/chat/${data.room}`) {
+        history.push(`/chat/${data.room}`);
+      }
     });
   }, [socket, messages]);
 
@@ -34,6 +40,7 @@ export function SocketProvider({ children }) {
     messages,
     user,
     setMessages,
+    setUser,
   }), [messages, user, socket]);
 
   return (

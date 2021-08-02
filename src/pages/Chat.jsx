@@ -29,11 +29,13 @@ export default function Chat() {
   const { room } = useParams();
   const { messages, user } = useSocket();
   const [message, setMessage] = useState('');
-  const { socket } = useSocket();
+  const { socket, setMessages, setUser } = useSocket();
   const messageBoardRef = useRef(null);
 
   useEffect(() => {
-    messageBoardRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (messageBoardRef?.current) {
+      messageBoardRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
   const sendChat = () => {
@@ -44,6 +46,12 @@ export default function Chat() {
   if (!user) {
     return <Redirect to="/login" />;
   }
+
+  const onLeave = () => {
+    setUser(undefined);
+    setMessages([]);
+    socket.emit('leave');
+  };
 
   return (
     <Container component="main" className={classes.container}>
@@ -58,7 +66,7 @@ export default function Chat() {
                   {`in ${room}`}
                 </Typography>
               </Typography>
-              <Button color="primary">{user.isRoomCreator ? 'Log out' : 'Leave'}</Button>
+              <Button color="primary" onClick={onLeave}>{user.isRoomCreator ? 'Log out' : 'Leave'}</Button>
             </Grid>
             <Box py={2}>
               <Divider />
