@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Redirect, useParams } from 'react-router-dom';
 import {
   Box, Button, Container, Divider, Grid, Paper, TextField, Typography,
@@ -30,6 +30,11 @@ export default function Chat() {
   const { messages, user } = useSocket();
   const [message, setMessage] = useState('');
   const { socket } = useSocket();
+  const messageBoardRef = useRef(null);
+
+  useEffect(() => {
+    messageBoardRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const sendChat = () => {
     socket.emit('chat', message);
@@ -67,6 +72,7 @@ export default function Chat() {
                   sent={item.userId === user.id}
                 />
               ))}
+              <Box ref={messageBoardRef} />
             </Box>
             <Grid container wrap="nowrap">
               <TextField
