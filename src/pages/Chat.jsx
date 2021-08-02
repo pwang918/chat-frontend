@@ -1,9 +1,12 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Redirect, useParams } from 'react-router-dom';
 import {
   Box, Button, Container, Divider, Grid, Paper, TextField, Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import Message from 'components/Message';
+import useSocket from 'hooks/useSocket';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -15,27 +18,70 @@ const useStyles = makeStyles(() => ({
     width: 400,
     height: 600,
   },
+  messages: {
+    flex: 1,
+    overflow: 'auto',
+  },
 }));
 
 export default function Chat() {
   const classes = useStyles();
   const { room } = useParams();
+  const { messages, user } = useSocket();
+  const [message, setMessage] = useState('');
+  const { socket } = useSocket();
+
+  const sendChat = () => {
+    socket.emit('chat', message);
+    setMessage('');
+  };
+
+  if (!user) {
+    return <Redirect to="/login" />;
+  }
 
   return (
     <Container component="main" className={classes.container}>
       <Box width={1} m={5} display="flex" justifyContent="flex-end">
         <Paper className={classes.content}>
           <Box p={2} display="flex" flexDirection="column" boxSizing="border-box" height={1}>
-            <Typography variant="h4">{room}</Typography>
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography variant="h4">
+                {user.username}
+                {' '}
+                <Typography variant="subtitle1" component="span">
+                  {`in ${room}`}
+                </Typography>
+              </Typography>
+              <Button color="primary">{user.isRoomCreator ? 'Log out' : 'Leave'}</Button>
+            </Grid>
             <Box py={2}>
               <Divider />
             </Box>
-            <Box height={1}>
-              <Typography>Content</Typography>
+            <Box className={classes.messages}>
+              {messages.map((item, index) => (
+                <Message
+                  message={item.text}
+                  key={index}
+                  username={item.username}
+                  sent={item.userId === user.id}
+                />
+              ))}
             </Box>
             <Grid container wrap="nowrap">
-              <TextField label="Enter your message" variant="outlined" fullWidth />
-              <Button variant="contained" color="primary">Send</Button>
+              <TextField
+                label="Enter your message"
+                value={message}
+                variant="outlined"
+                fullWidth
+                onChange={(event) => setMessage(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.keyCode === 13) {
+                    sendChat();
+                  }
+                }}
+              />
+              <Button variant="contained" color="primary" disabled={!message} onClick={sendChat}>Send</Button>
             </Grid>
           </Box>
         </Paper>

@@ -31,9 +31,11 @@ export default function Login() {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [roomname, setRoomname] = useState('');
-  const socket = useSocket();
+  const [loading, setLoading] = useState(false);
+  const { socket } = useSocket();
 
   const onJoinRoom = () => {
+    setLoading(true);
     socket.emit('join', { username, roomname });
   };
 
@@ -69,7 +71,7 @@ export default function Login() {
               <Button
                 variant="contained"
                 color="primary"
-                disabled={!username || !roomname}
+                disabled={!username || !roomname || loading}
                 onClick={onJoinRoom}
               >
                 Join

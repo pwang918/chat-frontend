@@ -9,16 +9,16 @@ import Login from 'pages/Login';
 
 function App() {
   return (
-    <SocketProvider>
-      <Router>
+    <Router>
+      <SocketProvider>
         <Switch>
           <Route exact path="/" render={() => <Redirect to="login" />} />
           <Route path="/login" component={Login} />
           <Route path="/chat/:room" component={Chat} />
           <Redirect to="/" />
         </Switch>
-      </Router>
-    </SocketProvider>
+      </SocketProvider>
+    </Router>
   );
 }
 
