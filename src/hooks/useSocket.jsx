@@ -8,7 +8,7 @@ import io from 'socket.io-client';
 export const SocketContext = createContext();
 
 export function SocketProvider({ children }) {
-  const [socket] = useState(io.connect('/'));
+  const [socket] = useState(io.connect('http://localhost:8000'));
   const [user, setUser] = useState();
   const [messages, setMessages] = useState([]);
   const history = useHistory();
@@ -34,6 +34,12 @@ export function SocketProvider({ children }) {
       }
     });
   }, [socket, messages]);
+
+  useEffect(() => {
+    if (history.location.pathname === '/login') {
+      setMessages([]);
+    }
+  }, [history]);
 
   const memoedValue = useMemo(() => ({
     socket,
